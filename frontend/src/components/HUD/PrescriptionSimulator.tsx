@@ -43,7 +43,7 @@ const PHASES: { id: MissionPhase; title: string; subtitle: string; tag: string }
 ];
 
 const ZONE_OPTIONS: { id: ZoneId | 'ALL'; label: string; solarShare: number; areaShare: number }[] = [
-  { id: 'ALL', label: 'All Dubai South Corridor', solarShare: 1.0, areaShare: 1.0 },
+  { id: 'ALL', label: 'All Dubai South Corridor (2,150 Bldgs)', solarShare: 1.0, areaShare: 1.0 },
   { id: 'expo-core', label: 'Expo City Benchmark', solarShare: 0.16, areaShare: 0.18 },
   { id: 'logistics-mega', label: 'Logistics Solar Mega-Roof', solarShare: 0.48, areaShare: 0.38 },
   { id: 'residential-growth', label: 'Residential Heat Hotspot', solarShare: 0.24, areaShare: 0.28 },
@@ -72,6 +72,11 @@ export function PrescriptionSimulator({
     }
   }, [missionPhase]);
 
+  const activePhaseObj = useMemo(
+    () => PHASES.find((p) => p.id === missionPhase) || PHASES[1],
+    [missionPhase]
+  );
+
   // Zone scaling factors
   const selectedZoneConfig = useMemo(() => {
     return (
@@ -87,7 +92,7 @@ export function PrescriptionSimulator({
     const areaFactor = selectedZoneConfig.areaShare * phaseMult;
 
     // 1. Solar Generation (GWh/yr)
-    const baseSolarGwh = 438.7; // From district_summary.json (250.7 MWp)
+    const baseSolarGwh = 438.7; // Verified baseline
     const solarGwh = deploySolar ? Math.round(baseSolarGwh * solarFactor * 10) / 10 : 0;
 
     // 2. Surface Heat Island Reduction (ΔLST °C)
@@ -152,13 +157,18 @@ export function PrescriptionSimulator({
             Closed-Loop Prescription Engine
           </span>
         </div>
-        <button
-          onClick={() => setIsCollapsed((v) => !v)}
-          className="rounded p-1 text-slate-400 hover:bg-slate-800 hover:text-emerald-300"
-          title={isCollapsed ? 'Expand Simulator' : 'Collapse Simulator'}
-        >
-          {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-        </button>
+        <div className="flex items-center gap-1.5">
+          <span className="rounded bg-emerald-950/90 border border-emerald-500/40 px-1.5 py-0.5 text-[9px] font-mono text-emerald-300">
+            SPACE-VERIFIED
+          </span>
+          <button
+            onClick={() => setIsCollapsed((v) => !v)}
+            className="rounded p-1 text-slate-400 hover:bg-slate-800 hover:text-emerald-300"
+            title={isCollapsed ? 'Expand Simulator' : 'Collapse Simulator'}
+          >
+            {isCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
       {!isCollapsed && (
@@ -176,7 +186,7 @@ export function PrescriptionSimulator({
                   onClick={() => onChangeMissionPhase(p.id)}
                   className={`flex flex-col items-center justify-center rounded-lg p-2 text-center transition border ${
                     missionPhase === p.id
-                      ? 'border-cyan-400 bg-cyan-950/70 text-cyan-300 shadow-md shadow-cyan-950/50'
+                      ? 'border-cyan-400 bg-cyan-950/70 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.2)]'
                       : 'border-slate-800 bg-slate-950/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
                   }`}
                 >
@@ -184,6 +194,9 @@ export function PrescriptionSimulator({
                   <span className="text-[9px] text-slate-400 line-clamp-1">{p.tag}</span>
                 </button>
               ))}
+            </div>
+            <div className="mt-1.5 text-[10px] text-slate-400 font-mono truncate">
+              {activePhaseObj.subtitle}
             </div>
           </div>
 
@@ -217,7 +230,7 @@ export function PrescriptionSimulator({
               onClick={() => togglePrescription('deploySolar')}
               className={`flex w-full items-center justify-between rounded-lg border p-2 text-left transition ${
                 appliedPrescriptions.deploySolar
-                  ? 'border-amber-500/50 bg-amber-950/40 text-amber-200'
+                  ? 'border-amber-500/60 bg-amber-950/40 text-amber-200 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
                   : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'
               }`}
             >
@@ -252,7 +265,7 @@ export function PrescriptionSimulator({
               onClick={() => togglePrescription('applyCoolRoof')}
               className={`flex w-full items-center justify-between rounded-lg border p-2 text-left transition ${
                 appliedPrescriptions.applyCoolRoof
-                  ? 'border-cyan-500/50 bg-cyan-950/40 text-cyan-200'
+                  ? 'border-cyan-500/60 bg-cyan-950/40 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
                   : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'
               }`}
             >
@@ -287,7 +300,7 @@ export function PrescriptionSimulator({
               onClick={() => togglePrescription('smartNightDimming')}
               className={`flex w-full items-center justify-between rounded-lg border p-2 text-left transition ${
                 appliedPrescriptions.smartNightDimming
-                  ? 'border-violet-500/50 bg-violet-950/40 text-violet-200'
+                  ? 'border-violet-500/60 bg-violet-950/40 text-violet-200 shadow-[0_0_15px_rgba(139,92,246,0.15)]'
                   : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:border-slate-700'
               }`}
             >

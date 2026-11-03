@@ -4,11 +4,20 @@ import type { OrbitalTelemetryPacket } from '../types/contracts';
 const DOWNTIME_RECONNECT_MS = 6000;
 
 const DUBAI_SOUTH_WAYPOINTS = [
+  { lat: 24.9602, lon: 55.1512, tile_id: 'S2_24960_55151', cls: 'Industrial', conf: 0.96 },
+  { lat: 24.9535, lon: 55.1595, tile_id: 'S2_24953_55159', cls: 'Industrial', conf: 0.98 },
+  { lat: 24.9468, lon: 55.1678, tile_id: 'S2_24946_55167', cls: 'Residential', conf: 0.94 },
+  { lat: 24.9401, lon: 55.1761, tile_id: 'S2_24940_55176', cls: 'Highway', conf: 0.92 },
+  { lat: 24.9334, lon: 55.1844, tile_id: 'S2_24933_55184', cls: 'BareDesert', conf: 0.99 },
+  { lat: 24.9267, lon: 55.1927, tile_id: 'S2_24926_55192', cls: 'Residential', conf: 0.95 },
+  { lat: 24.9200, lon: 55.2010, tile_id: 'S2_24920_55201', cls: 'Industrial', conf: 0.97 },
+  { lat: 24.9133, lon: 55.1920, tile_id: 'S2_24913_55192', cls: 'AnnualCrop', conf: 0.91 },
+  { lat: 24.9066, lon: 55.1830, tile_id: 'S2_24906_55183', cls: 'BareDesert', conf: 0.99 },
+  { lat: 24.8999, lon: 55.1740, tile_id: 'S2_24899_55174', cls: 'Industrial', conf: 0.96 },
+  { lat: 24.8932, lon: 55.1650, tile_id: 'S2_24893_55165', cls: 'Highway', conf: 0.93 },
+  { lat: 24.9050, lon: 55.1560, tile_id: 'S2_24905_55156', cls: 'CloudCover', conf: 0.98 },
   { lat: 24.9180, lon: 55.1680, tile_id: 'S2_24918_55168', cls: 'Industrial', conf: 0.96 },
-  { lat: 24.9420, lon: 55.2050, tile_id: 'S2_24942_55205', cls: 'Residential', conf: 0.95 },
-  { lat: 24.9600, lon: 55.1510, tile_id: 'S2_24960_55151', cls: 'Industrial', conf: 0.97 },
-  { lat: 24.9020, lon: 55.1650, tile_id: 'S2_24902_55165', cls: 'Highway', conf: 0.94 },
-  { lat: 24.9350, lon: 55.1850, tile_id: 'S2_24935_55185', cls: 'AnnualCrop', conf: 0.93 },
+  { lat: 24.9350, lon: 55.1850, tile_id: 'S2_24935_55185', cls: 'Residential', conf: 0.95 },
   { lat: 24.9520, lon: 55.1420, tile_id: 'S2_24952_55142', cls: 'Industrial', conf: 0.98 },
 ];
 
@@ -35,6 +44,7 @@ export function useTelemetryStream(
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isFallback, setIsFallback] = useState<boolean>(true);
   const [flightMode, setFlightMode] = useState<'NOMINAL_EO_SCAN' | 'THERMAL_PEAK_1430' | 'SAFEHOLD'>(initialFlightMode);
+  const [uplinkStatus, setUplinkStatus] = useState<string>('IDLE');
 
   const fallbackTimerRef = useRef<number | null>(null);
   const reconnectTimerRef = useRef<number | null>(null);
@@ -55,9 +65,9 @@ export function useTelemetryStream(
   const runFallbackTick = useCallback(() => {
     seqCounterRef.current = (seqCounterRef.current + 1) & 0x3fff;
     const elapsedSec = (Date.now() - startTimeRef.current) / 1000;
-    const wpIndex = Math.floor(elapsedSec / 4) % DUBAI_SOUTH_WAYPOINTS.length;
+    const wpIndex = Math.floor(elapsedSec / 3) % DUBAI_SOUTH_WAYPOINTS.length;
     const wpNextIndex = (wpIndex + 1) % DUBAI_SOUTH_WAYPOINTS.length;
-    const progress = (elapsedSec % 4) / 4;
+    const progress = (elapsedSec % 3) / 3;
 
     const wpA = DUBAI_SOUTH_WAYPOINTS[wpIndex];
     const wpB = DUBAI_SOUTH_WAYPOINTS[wpNextIndex];
@@ -70,11 +80,15 @@ export function useTelemetryStream(
     const q2 = Number((0.05 * Math.cos(elapsedSec * 0.3)).toFixed(3));
     const q3 = Number((0.08 * Math.sin(elapsedSec * 0.2)).toFixed(3));
     const q0 = Number(Math.sqrt(Math.max(0, 1.0 - q1 * q1 - q2 * q2 - q3 * q3)).toFixed(3));
-    const temp_c = Number((42.0 + 4.8 * Math.sin(elapsedSec * 0.15)).toFixed(1));
+    const tempBase = flightModeRef.current === 'THERMAL_PEAK_1430' ? 43.2 : flightModeRef.current === 'SAFEHOLD' ? 35.5 : 39.8;
+    const temp_c = Number((tempBase + 3.8 * Math.sin(elapsedSec * 0.15)).toFixed(1));
 
     const currentMode = flightModeRef.current;
     const nadirLocked = currentMode !== 'SAFEHOLD';
     const ccsdsHeader = generateCcsdsHex(seqCounterRef.current, 0x001);
+
+    const isDroppedTile = wpA.cls === 'BareDesert' || wpA.cls === 'CloudCover';
+    const inferenceMs = Number((0.50 + 0.04 * Math.abs(Math.sin(elapsedSec))).toFixed(2));
 
     const fallbackPacket: OrbitalTelemetryPacket = {
       ccsds_header_hex: ccsdsHeader,
@@ -96,10 +110,10 @@ export function useTelemetryStream(
         lon,
         predicted_class: wpA.cls,
         confidence: wpA.conf,
-        inference_ms: 0.52,
-        action: 'DOWNLINK_PRIORITY_ALERT',
-        bandwidth_saved_pct: 78.4,
-        change_detected: true,
+        inference_ms: inferenceMs,
+        action: isDroppedTile ? 'DROP_STATIC_DESERT' : 'DOWNLINK_PRIORITY_ALERT',
+        bandwidth_saved_pct: isDroppedTile ? 84.2 : 78.4,
+        change_detected: !isDroppedTile,
       },
     };
 
@@ -123,13 +137,20 @@ export function useTelemetryStream(
     setIsFallback(false);
   }, []);
 
-  // Connect WebSocket with resilient fallback
+  // Connect WebSocket with resilient fallback & 1.5s connect timeout
   const connectSocket = useCallback(() => {
     try {
       const ws = new WebSocket('ws://localhost:8000/ws/telemetry');
       socketRef.current = ws;
 
+      const connectTimeout = window.setTimeout(() => {
+        if (ws.readyState !== WebSocket.OPEN) {
+          startFallback();
+        }
+      }, 1500);
+
       ws.onopen = () => {
+        clearTimeout(connectTimeout);
         setIsConnected(true);
         stopFallback();
       };
@@ -147,10 +168,12 @@ export function useTelemetryStream(
       };
 
       ws.onerror = () => {
+        clearTimeout(connectTimeout);
         startFallback();
       };
 
       ws.onclose = () => {
+        clearTimeout(connectTimeout);
         startFallback();
         // Schedule reconnect attempt
         if (!reconnectTimerRef.current) {
@@ -184,6 +207,7 @@ export function useTelemetryStream(
     async (mode: 'NOMINAL_EO_SCAN' | 'THERMAL_PEAK_1430' | 'SAFEHOLD') => {
       setFlightMode(mode);
       flightModeRef.current = mode;
+      setUplinkStatus(`UPLINKING: ${mode}...`);
 
       try {
         const res = await fetch('http://localhost:8000/api/command', {
@@ -194,9 +218,12 @@ export function useTelemetryStream(
         if (!res.ok) {
           throw new Error(`Uplink HTTP status ${res.status}`);
         }
+        setUplinkStatus(`ACK: ${mode}`);
       } catch {
         // Fallback uplink: mode already applied to local state and fallback generator
+        setUplinkStatus(`SIM ACK: ${mode}`);
       }
+      window.setTimeout(() => setUplinkStatus('IDLE'), 3500);
     },
     []
   );
@@ -206,6 +233,7 @@ export function useTelemetryStream(
     isConnected,
     isFallback,
     flightMode,
+    uplinkStatus,
     sendCommand,
   };
 }

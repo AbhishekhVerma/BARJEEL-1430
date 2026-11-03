@@ -91,6 +91,17 @@ export function OrbitalTwinPiP({ telemetry }: OrbitalTwinPiPProps) {
     const wireframe = new THREE.LineSegments(frameEdges, frameMat);
     chassis.add(wireframe);
 
+    // Gold Kapton S-Band Patch Antenna (+Y top face)
+    const patchGeo = new THREE.BoxGeometry(0.68, 0.06, 0.68);
+    const patchMat = new THREE.MeshStandardMaterial({
+      color: 0xd97706,
+      metalness: 0.9,
+      roughness: 0.2,
+    });
+    const patchMesh = new THREE.Mesh(patchGeo, patchMat);
+    patchMesh.position.set(0, 1.53, 0);
+    satGroup.add(patchMesh);
+
     // EO Lens / Nadir Payload Aperture on bottom face (-Y)
     const opticsGeo = new THREE.CylinderGeometry(0.28, 0.32, 0.12, 24);
     const opticsMat = new THREE.MeshStandardMaterial({
@@ -251,6 +262,8 @@ export function OrbitalTwinPiP({ telemetry }: OrbitalTwinPiPProps) {
       chassisMat.dispose();
       frameEdges.dispose();
       frameMat.dispose();
+      patchGeo.dispose();
+      patchMat.dispose();
       opticsGeo.dispose();
       opticsMat.dispose();
       ringGeo.dispose();
@@ -270,6 +283,7 @@ export function OrbitalTwinPiP({ telemetry }: OrbitalTwinPiPProps) {
   }, []);
 
   const tempVal = telemetry?.adcs.temp_c ?? 42.0;
+  const nadirLocked = telemetry?.adcs.nadir_locked ?? true;
   const tempBadgeColor =
     tempVal < 38.0
       ? 'border-cyan-500/40 text-cyan-400 bg-cyan-950/60'
@@ -298,8 +312,10 @@ export function OrbitalTwinPiP({ telemetry }: OrbitalTwinPiPProps) {
           <Radio className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
           <span>3U CUBESAT // BARJEEL-1430</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] text-slate-400">{telemetry?.solar_local_time || '14:30 GST'}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="rounded bg-cyan-950/80 border border-cyan-500/30 px-1.5 py-0.5 text-[9px] text-cyan-300">
+            {telemetry?.flight_mode || 'THERMAL_PEAK_1430'}
+          </span>
           <button
             onClick={() => setIsMinimized((v) => !v)}
             className="rounded p-1 text-slate-400 hover:bg-slate-800 hover:text-cyan-300"
@@ -318,15 +334,24 @@ export function OrbitalTwinPiP({ telemetry }: OrbitalTwinPiPProps) {
           {/* HUD Attitude & Thermal Overlays */}
           <div className="pointer-events-none absolute top-2 left-2 flex flex-col gap-1 text-[10px] font-mono">
             <span className="rounded bg-slate-950/80 px-1.5 py-0.5 text-cyan-300 border border-cyan-500/30">
-              {formatMet(telemetry?.met_ms)}
+              {formatMet(telemetry?.met_ms)} · {telemetry?.solar_local_time || '14:30 GST'}
             </span>
             <div className="rounded bg-slate-950/80 px-1.5 py-0.5 text-slate-300 border border-slate-700/50">
               R:{eulerDeg.roll}° P:{eulerDeg.pitch}° Y:{eulerDeg.yaw}°
             </div>
-            <div className="flex items-center gap-1 rounded bg-slate-950/80 px-1.5 py-0.5 border border-slate-700/50">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span className="text-emerald-400 font-semibold">
-                {telemetry?.adcs.nadir_locked ? 'NADIR: LOCKED' : 'NADIR: ACQUIRING'}
+            <div className="flex items-center gap-1.5 rounded bg-slate-950/80 px-1.5 py-0.5 border border-slate-700/50">
+              <span className="relative flex h-2 w-2">
+                {nadirLocked && (
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                )}
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    nadirLocked ? 'bg-emerald-500' : 'bg-amber-500'
+                  }`}
+                />
+              </span>
+              <span className={nadirLocked ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
+                {nadirLocked ? 'NADIR: LOCKED' : 'NADIR: ACQUIRING'}
               </span>
             </div>
           </div>
@@ -337,7 +362,8 @@ export function OrbitalTwinPiP({ telemetry }: OrbitalTwinPiPProps) {
               <span>RAD: {tempVal.toFixed(1)}°C</span>
             </div>
             <span className="rounded bg-slate-950/70 px-1.5 py-0.5 text-[9px] text-slate-400 border border-slate-800">
-              ADCS Q[{telemetry?.adcs.q0?.toFixed(2) ?? '1.00'}, {telemetry?.adcs.q1?.toFixed(2) ?? '0.00'}]
+              Q[{telemetry?.adcs.q0?.toFixed(2) ?? '1.00'}, {telemetry?.adcs.q1?.toFixed(2) ?? '0.00'},{' '}
+              {telemetry?.adcs.q2?.toFixed(2) ?? '0.00'}, {telemetry?.adcs.q3?.toFixed(2) ?? '0.00'}]
             </span>
           </div>
         </div>

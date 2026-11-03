@@ -38,25 +38,67 @@ export interface BuildingFeatureProps {
   priority_score: number;
 }
 
+export type BuildingFeatureProperties = BuildingFeatureProps;
+
+export interface BuildingGeoJSONFeature {
+  type: 'Feature';
+  id?: string;
+  properties: BuildingFeatureProps;
+  geometry: {
+    type: 'Polygon';
+    coordinates: number[][][];
+  };
+}
+
+export interface BuildingGeoJSONCollection {
+  type: 'FeatureCollection';
+  features: BuildingGeoJSONFeature[];
+}
+
 export interface ZoneDefinition {
   id: ZoneId;
   name: string;
   center: [number, number];
   zoom: number;
   summary: string;
+  description?: string;
+  primary_focus?: PrescriptionType;
+}
+
+export interface ZoneSummary {
+  building_count: number;
+  total_roof_area_m2: number;
+  total_solar_capacity_kwp: number;
+  total_solar_mwp: number;
+  total_solar_kwh_yr: number;
+  total_solar_gwh_yr: number;
+  avg_lst_celsius: number;
+  avg_subsidence_mm_yr: number;
+  avg_sar_coherence: number;
+  avg_viirs_radiance: number;
+  tco2_avoided_yr: number;
+  prescriptions: Record<PrescriptionType, number>;
 }
 
 export interface DistrictSummary {
   mission: string;
   aoi_name: string;
+  theme?: string;
+  aoi?: string;
+  aoi_bbox?: [number, number, number, number];
+  default_camera_center?: [number, number];
   total_buildings: number;
   total_roof_area_m2: number;
+  total_solar_capacity_kwp?: number;
   total_solar_capacity_mwp: number;
   total_solar_gwh_yr: number;
+  total_tco2_offset_yr?: number;
   mean_lst_celsius: number;
   hotspot_count: number;
   subsidence_watch_count: number;
+  target_350mwp_achieved?: boolean;
   data_source: 'REAL_STAC_SATELLITE_FUSION';
+  zones?: Record<ZoneId, ZoneSummary>;
 }
 
 export interface AppliedPrescriptions {
@@ -121,4 +163,3 @@ export interface MissionHUDProps {
   onToggleBasemap: () => void;
   onTelemetryUpdate: (packet: OrbitalTelemetryPacket) => void;
 }
-

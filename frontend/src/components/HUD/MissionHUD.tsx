@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react';
 import {
   Satellite,
-  Layers,
   Flame,
   Sun,
   Moon,
@@ -15,6 +15,8 @@ import {
   X,
   Building,
   Zap,
+  Play,
+  Pause,
 } from 'lucide-react';
 import { useTelemetryStream } from '../../hooks/useTelemetryStream';
 import { OrbitalTwinPiP } from './OrbitalTwinPiP';
@@ -59,10 +61,21 @@ export function MissionHUD({
   onTelemetryUpdate,
 }: MissionHUDProps) {
   // Connect to live telemetry stream with automatic fallback
-  const { telemetry, isFallback, flightMode, sendCommand } = useTelemetryStream(
+  const { telemetry, isFallback, flightMode, uplinkStatus, sendCommand } = useTelemetryStream(
     onTelemetryUpdate,
     'THERMAL_PEAK_1430'
   );
+
+  // Auto-play timeline animation (2019 -> 2026)
+  const [isPlayingYear, setIsPlayingYear] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!isPlayingYear) return;
+    const timer = window.setInterval(() => {
+      onChangeYear(selectedYear >= 2026 ? 2019 : selectedYear + 1);
+    }, 1200);
+    return () => clearInterval(timer);
+  }, [isPlayingYear, selectedYear, onChangeYear]);
 
   const sourceBadgeStyle =
     telemetry?.source === 'ESP32_S3_HIL'
@@ -70,6 +83,9 @@ export function MissionHUD({
       : telemetry?.source === 'SIM_OBC'
       ? 'border-cyan-500/60 bg-cyan-950/80 text-cyan-300'
       : 'border-amber-500/60 bg-amber-950/80 text-amber-300';
+
+  const edgeAction = telemetry?.edge_ai.action || 'DOWNLINK_PRIORITY_ALERT';
+  const isPriorityAlert = edgeAction === 'DOWNLINK_PRIORITY_ALERT';
 
   return (
     <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3 sm:p-4 overflow-hidden">
@@ -121,8 +137,15 @@ export function MissionHUD({
 
           {/* Timeline & Basemap Toggles */}
           <div className="flex flex-wrap items-center gap-3">
-            {/* Timeline Slider */}
+            {/* Timeline Slider with Play/Pause */}
             <div className="flex items-center gap-2 rounded-lg border border-slate-700/60 bg-slate-950/60 px-2.5 py-1 text-xs text-slate-300">
+              <button
+                onClick={() => setIsPlayingYear((prev) => !prev)}
+                className="flex h-5 w-5 items-center justify-center rounded bg-sky-500/20 border border-sky-500/40 text-sky-300 hover:bg-sky-500/30 transition"
+                title={isPlayingYear ? 'Pause 2019–2026 growth animation' : 'Play 2019–2026 growth animation'}
+              >
+                {isPlayingYear ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+              </button>
               <Calendar className="h-3.5 w-3.5 text-sky-400" />
               <span className="font-mono font-bold text-sky-300">{selectedYear}</span>
               <input
@@ -174,7 +197,7 @@ export function MissionHUD({
             ))}
           </div>
 
-          {/* Right: CCSDS Header + EuroSAT ONNX Badge + Hardware Source + Uplink Buttons */}
+          {/* Right: CCSDS Header + EuroSAT ONNX Badge + Action + Hardware Source + Uplink Buttons */}
           <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
             {/* CCSDS 133.0-B-2 Packet Header */}
             <div className="flex items-center gap-1 rounded border border-slate-700 bg-slate-950/70 px-2 py-0.5 text-slate-300">
@@ -195,6 +218,17 @@ export function MissionHUD({
                   {Math.round((telemetry?.edge_ai.confidence ?? 0.96) * 100)}%)
                 </strong>
               </span>
+            </div>
+
+            {/* Edge AI Action Decision Pill */}
+            <div
+              className={`hidden xl:flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] font-bold ${
+                isPriorityAlert
+                  ? 'border-amber-500/50 bg-amber-950/70 text-amber-300'
+                  : 'border-slate-600/60 bg-slate-900/80 text-slate-400'
+              }`}
+            >
+              <span>{edgeAction}</span>
             </div>
 
             {/* Inference Latency & Downlink Saved */}
@@ -234,6 +268,11 @@ export function MissionHUD({
                   {mode === 'NOMINAL_EO_SCAN' ? 'SCAN' : mode === 'THERMAL_PEAK_1430' ? '14:30 PEAK' : 'SAFEHOLD'}
                 </button>
               ))}
+              {uplinkStatus !== 'IDLE' && (
+                <span className="rounded bg-emerald-950/90 border border-emerald-500/40 px-1.5 py-0.5 text-[9px] text-emerald-300">
+                  {uplinkStatus}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -252,7 +291,12 @@ export function MissionHUD({
             <div className="flex items-center justify-between border-b border-amber-500/30 pb-2">
               <div className="flex items-center gap-2">
                 <Building className="h-4 w-4 text-amber-400" />
-                <span className="font-bold text-amber-400 text-sm">{selectedBuilding.name}</span>
+                <div>
+                  <div className="font-bold text-amber-400 text-sm">{selectedBuilding.name}</div>
+                  <div className="text-[10px] font-mono text-slate-400">
+                    ID: {selectedBuilding.id} · Built {selectedBuilding.growth_year}
+                  </div>
+                </div>
               </div>
               <button
                 onClick={onClearBuilding}
@@ -265,9 +309,11 @@ export function MissionHUD({
 
             <div className="grid grid-cols-2 gap-2.5 mt-3 font-mono text-[11px]">
               <div className="rounded border border-slate-800 bg-slate-950/60 p-2">
-                <div className="text-slate-400">ZONE / HEIGHT</div>
+                <div className="text-slate-400">ZONE / GEOMETRY</div>
                 <div className="font-bold text-slate-200">{selectedBuilding.zone_id}</div>
-                <div className="text-slate-400">{selectedBuilding.height_m} m extrusion</div>
+                <div className="text-slate-400">
+                  {selectedBuilding.height_m}m · {selectedBuilding.roof_area_m2.toLocaleString()} m²
+                </div>
               </div>
 
               <div className="rounded border border-slate-800 bg-slate-950/60 p-2">
@@ -283,11 +329,11 @@ export function MissionHUD({
               </div>
 
               <div className="rounded border border-slate-800 bg-slate-950/60 p-2">
-                <div className="text-slate-400">INSAR STABILITY</div>
+                <div className="text-slate-400">INSAR & VIIRS</div>
                 <div className={`font-bold ${selectedBuilding.subsidence_mm_yr < -2 ? 'text-red-400' : 'text-emerald-400'}`}>
-                  {selectedBuilding.subsidence_mm_yr} mm/yr
+                  {selectedBuilding.subsidence_mm_yr} mm/yr (γ={selectedBuilding.sar_coherence.toFixed(2)})
                 </div>
-                <div className="text-slate-400">Coherence: {selectedBuilding.sar_coherence.toFixed(2)}</div>
+                <div className="text-purple-300">{selectedBuilding.viirs_radiance} nW/cm²/sr</div>
               </div>
             </div>
 
