@@ -1,0 +1,34 @@
+{
+  "mission": "BARJEEL-1430",
+  "architecture": "MobileNetV3-Small (Mixed-Precision INT8 Linear/Gemm, Sentinel-2 10-Class)",
+  "input_shape": [
+    1,
+    3,
+    64,
+    64
+  ],
+  "classes": [
+    "AnnualCrop",
+    "Forest",
+    "HerbaceousVegetation",
+    "Highway",
+    "Industrial",
+    "Pasture",
+    "PermanentCrop",
+    "Residential",
+    "River",
+    "SeaLake"
+  ],
+  "train_samples": 4000,
+  "val_samples": 889,
+  "training_time_sec": 95.0,
+  "fp32_val_accuracy_pct": 95.73,
+  "int8_val_accuracy_pct": 95.73,
+  "fp32_model_size_mb": 5.838,
+  "int8_model_size_mb": 4.134,
+  "model_compression_pct": 29.2,
+  "mean_inference_ms": 0.524,
+  "p95_inference_ms": 0.666,
+  "exported_s2_patches": 34,
+  "expected_orbital_downlink_saved_pct": 78.4
+}
