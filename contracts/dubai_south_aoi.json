@@ -1,0 +1,41 @@
+{
+  "mission": "BARJEEL-1430",
+  "aoi_name": "Dubai South & Expo City Corridor",
+  "bbox": [55.1200, 24.8800, 55.2400, 24.9800],
+  "default_camera": {
+    "center": [55.1580, 24.9480],
+    "zoom": 13.4,
+    "pitch": 58,
+    "bearing": 135
+  },
+  "zones": [
+    {
+      "id": "expo-core",
+      "name": "Expo City Sustainability Benchmark",
+      "center": [55.1510, 24.9600],
+      "zoom": 14.8,
+      "summary": "Benchmark low-albedo passive cooling canopies (Al Wasl) & integrated solar pavilions."
+    },
+    {
+      "id": "logistics-mega",
+      "name": "Dubai South Logistics Solar Corridor",
+      "center": [55.1680, 24.9180],
+      "zoom": 14.4,
+      "summary": "High-density flat-roof mega-warehouses — #1 DEWA Shams Dubai rooftop solar yield zone."
+    },
+    {
+      "id": "residential-growth",
+      "name": "Dubai South Residential Boom Zone",
+      "center": [55.2050, 24.9420],
+      "zoom": 14.3,
+      "summary": "Fastest 2019–2026 desert-to-urban expansion & afternoon 14:30 GST heat island hotspot."
+    },
+    {
+      "id": "aviation-infra",
+      "name": "Al Maktoum Infrastructure Perimeter",
+      "center": [55.1650, 24.9020],
+      "zoom": 14.2,
+      "summary": "Heavy geotechnical load & Sentinel-1 SAR millimeter-scale ground stability watch corridor."
+    }
+  ]
+}

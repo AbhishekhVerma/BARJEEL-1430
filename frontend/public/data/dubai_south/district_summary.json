@@ -1,0 +1,12 @@
+{
+  "mission": "BARJEEL-1430",
+  "aoi_name": "Dubai South & Expo City Corridor",
+  "total_buildings": 180,
+  "total_roof_area_m2": 1928364.0,
+  "total_solar_capacity_mwp": 250.69,
+  "total_solar_gwh_yr": 438.7,
+  "mean_lst_celsius": 45.38,
+  "hotspot_count": 105,
+  "subsidence_watch_count": 24,
+  "data_source": "STARTER_SIMULATION"
+}

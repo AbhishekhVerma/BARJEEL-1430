@@ -1,0 +1,25 @@
+{
+  "ccsds_header_hex": "0801C04A003F",
+  "met_ms": 148000,
+  "source": "SIM_OBC",
+  "flight_mode": "NOMINAL_EO_SCAN",
+  "solar_local_time": "14:30 GST",
+  "adcs": {
+    "q0": 0.98,
+    "q1": 0.12,
+    "q2": -0.08,
+    "q3": 0.11,
+    "nadir_locked": true
+  },
+  "edge_ai": {
+    "tile_id": "S2_24918_55168",
+    "lat": 24.918,
+    "lon": 55.168,
+    "predicted_class": "Industrial",
+    "confidence": 0.96,
+    "inference_ms": 6.4,
+    "action": "DOWNLINK_PRIORITY_ALERT",
+    "bandwidth_saved_pct": 78.4,
+    "change_detected": true
+  }
+}
