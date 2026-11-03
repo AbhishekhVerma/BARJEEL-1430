@@ -1,0 +1,100 @@
+{
+  "mission": "BARJEEL-1430",
+  "theme": "Cities from Orbit (Theme 02)",
+  "aoi": "Dubai South & Expo City Corridor",
+  "aoi_bbox": [
+    55.12,
+    24.88,
+    55.24,
+    24.98
+  ],
+  "default_camera_center": [
+    55.151,
+    24.96
+  ],
+  "total_buildings": 2150,
+  "total_roof_area_m2": 15544329.9,
+  "total_solar_capacity_kwp": 2020761.2,
+  "total_solar_capacity_mwp": 2020.76,
+  "total_solar_gwh_yr": 3536.33,
+  "total_tco2_offset_yr": 1485259,
+  "target_350mwp_achieved": true,
+  "zones": {
+    "expo-core": {
+      "zone_id": "expo-core",
+      "name": "Expo City Sustainability Benchmark",
+      "building_count": 450,
+      "total_roof_area_m2": 1402523.9,
+      "total_solar_capacity_kwp": 182327.7,
+      "total_solar_mwp": 182.33,
+      "total_solar_kwh_yr": 319073475,
+      "total_solar_gwh_yr": 319.07,
+      "avg_lst_celsius": 40.19,
+      "avg_subsidence_mm_yr": -0.28,
+      "avg_sar_coherence": 0.91,
+      "avg_viirs_radiance": 69.76,
+      "tco2_avoided_yr": 134011,
+      "prescriptions": {
+        "COOL_ROOF_CORRIDOR": 450
+      }
+    },
+    "logistics-mega": {
+      "zone_id": "logistics-mega",
+      "name": "Dubai South Logistics Corridor",
+      "building_count": 650,
+      "total_roof_area_m2": 10635370.1,
+      "total_solar_capacity_kwp": 1382597.9,
+      "total_solar_mwp": 1382.6,
+      "total_solar_kwh_yr": 2419546325,
+      "total_solar_gwh_yr": 2419.55,
+      "avg_lst_celsius": 47.04,
+      "avg_subsidence_mm_yr": -1.7,
+      "avg_sar_coherence": 0.85,
+      "avg_viirs_radiance": 49.32,
+      "tco2_avoided_yr": 1016209,
+      "prescriptions": {
+        "SOLAR_ARRAY": 296,
+        "SOLAR_AND_COOL_ROOF": 337,
+        "GEOTECH_AUDIT": 17
+      }
+    },
+    "residential-growth": {
+      "zone_id": "residential-growth",
+      "name": "Dubai South Residential Boom Zone",
+      "building_count": 750,
+      "total_roof_area_m2": 954063.7,
+      "total_solar_capacity_kwp": 124027.3,
+      "total_solar_mwp": 124.03,
+      "total_solar_kwh_yr": 217047775,
+      "total_solar_gwh_yr": 217.05,
+      "avg_lst_celsius": 48.23,
+      "avg_subsidence_mm_yr": -0.97,
+      "avg_sar_coherence": 0.82,
+      "avg_viirs_radiance": 37.94,
+      "tco2_avoided_yr": 91160,
+      "prescriptions": {
+        "COOL_ROOF_CORRIDOR": 750
+      }
+    },
+    "aviation-infra": {
+      "zone_id": "aviation-infra",
+      "name": "Al Maktoum Northern Infrastructure Perimeter",
+      "building_count": 300,
+      "total_roof_area_m2": 2552372.2,
+      "total_solar_capacity_kwp": 331808.3,
+      "total_solar_mwp": 331.81,
+      "total_solar_kwh_yr": 580664525,
+      "total_solar_gwh_yr": 580.66,
+      "avg_lst_celsius": 48.96,
+      "avg_subsidence_mm_yr": -3.3,
+      "avg_sar_coherence": 0.69,
+      "avg_viirs_radiance": 78.43,
+      "tco2_avoided_yr": 243879,
+      "prescriptions": {
+        "COOL_ROOF_CORRIDOR": 63,
+        "GEOTECH_AUDIT": 222,
+        "SMART_DIMMING": 15
+      }
+    }
+  }
+}
