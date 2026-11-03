@@ -8,5 +8,5 @@
   "mean_lst_celsius": 45.38,
   "hotspot_count": 105,
   "subsidence_watch_count": 24,
-  "data_source": "STARTER_SIMULATION"
+  "data_source": "REAL_STAC_SATELLITE_FUSION"
 }

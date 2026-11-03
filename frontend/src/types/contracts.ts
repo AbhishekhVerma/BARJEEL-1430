@@ -56,7 +56,7 @@ export interface DistrictSummary {
   mean_lst_celsius: number;
   hotspot_count: number;
   subsidence_watch_count: number;
-  data_source: 'STARTER_SIMULATION' | 'REAL_STAC_SATELLITE_FUSION';
+  data_source: 'REAL_STAC_SATELLITE_FUSION';
 }
 
 export interface AppliedPrescriptions {

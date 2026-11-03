@@ -1,0 +1,151 @@
+/* Mission BARJEEL-1430: 3D District Digital Twin Map Styles */
+
+/* Animated pulsing orbital scan reticle */
+.orbital-reticle-marker {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reticle-pulse-ring {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(6, 182, 212, 0.85);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.6);
+  animation: barjeel-reticle-pulse 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.reticle-crosshair {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 1.5px dashed rgba(34, 211, 238, 0.7);
+  border-radius: 50%;
+  animation: barjeel-reticle-spin 12s linear infinite;
+}
+
+.reticle-crosshair::before,
+.reticle-crosshair::after {
+  content: '';
+  position: absolute;
+  background-color: rgba(34, 211, 238, 0.85);
+}
+
+.reticle-crosshair::before {
+  top: -4px;
+  bottom: -4px;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.reticle-crosshair::after {
+  left: -4px;
+  right: -4px;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.reticle-core-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #22d3ee;
+  box-shadow: 0 0 12px #22d3ee, 0 0 24px rgba(6, 182, 212, 0.9);
+  z-index: 2;
+}
+
+.reticle-hud-badge {
+  position: absolute;
+  left: 68px;
+  top: -24px;
+  min-width: 190px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  color: #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(6, 182, 212, 0.25);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@keyframes barjeel-reticle-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes barjeel-reticle-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* MapLibre Building Selection Popup Custom Styling */
+.barjeel-building-popup .maplibregl-popup-content {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(6, 182, 212, 0.45);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 18px rgba(6, 182, 212, 0.2);
+  padding: 0;
+  color: #f1f5f9;
+}
+
+.barjeel-building-popup .maplibregl-popup-close-button {
+  color: #94a3b8;
+  padding: 6px 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.barjeel-building-popup .maplibregl-popup-close-button:hover {
+  color: #38bdf8;
+  background: transparent;
+}
+
+.barjeel-building-popup .maplibregl-popup-tip {
+  border-top-color: rgba(15, 23, 42, 0.95) !important;
+  border-bottom-color: rgba(15, 23, 42, 0.95) !important;
+}
+
+/* MapLibre Navigation Controls Dark Theme */
+.maplibregl-ctrl-group {
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(6, 182, 212, 0.3) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.maplibregl-ctrl-group button {
+  border-bottom: 1px solid rgba(6, 182, 212, 0.15) !important;
+}
+
+.maplibregl-ctrl-group button:last-child {
+  border-bottom: none !important;
+}
+
+.maplibregl-ctrl-icon {
+  filter: invert(1) hue-rotate(180deg);
+}
