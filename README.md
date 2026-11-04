@@ -1,7 +1,8 @@
 # Mission BARJEEL-1430 (برجيل-1430)
 
 **Autonomous Orbital Edge AI (`CCSDS 133.0-B-2` + Quantized `EuroSAT` INT8 ONNX) & Closed-Loop 3D Urban Sustainability Digital Twin**  
-*Supernova × SpacePoint Competition — Theme 02: Cities from Orbit (Smart and sustainable urban living)*  
+*SpacePoint Competition — Space Week 2026 (Theme 02: Cities from Orbit)*  
+**Team**: **Team Hermes 2.0** — BITS Pilani, Dubai Campus (Abhishekh Verma, Kapish Roy, Bhavya Sri Chinnamsetty, Vrushank Tipnis, Sivani Ajay)  
 **Target Area of Interest (AOI)**: **Dubai South & Expo City Corridor** (`[55.120°E, 24.880°N]` to `[55.240°E, 24.980°N]`)
 
 ---

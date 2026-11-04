@@ -101,7 +101,7 @@ export function MissionHUD({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-black tracking-widest text-cyan-400">
-                  SUPERNOVA × SPACEPOINT
+                  HERMES 2.0 × SPACEPOINT
                 </span>
                 <span className="rounded bg-cyan-950 px-1.5 py-0.5 text-[10px] font-mono text-cyan-300 border border-cyan-800">
                   BARJEEL-1430 (برجيل-1430)
